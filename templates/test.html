@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Container for the entire page */
+        .page-container {
+            display: flex;
+            height: 100vh; /* Set the height to 100% of the viewport */
+        }
+
+        /* Left side (20%) containing the form */
+        .left-side {
+            flex: 1; /* Occupy 20% of the available width */
+            background-color: #f0f0f0; /* Optional: Add a background color */
+            padding: 20px; /* Optional: Add some padding */
+        }
+
+        /* Right side (80%) containing the iframe */
+        .right-side {
+            flex: 4; /* Occupy 80% of the available width */
+            padding: 20px; /* Optional: Add some padding */
+        }
+
+        /* Style the iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Remove iframe border */
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="left-side">
+            <!-- Your form content goes here -->
+            <form>
+                <!-- Form fields, labels, etc. -->
+                <!-- Example: -->
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username">
+                <!-- Add other form elements as needed -->
+            </form>
+        </div>
+        <div class="right-side">
+            <!-- Your iframe content goes here -->
+            <iframe src="https://example.com"></iframe>
+        </div>
+    </div>
+</body>
+</html>

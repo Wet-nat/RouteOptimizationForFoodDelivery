@@ -7,53 +7,150 @@
 </head>
 <body>
     <link rel="stylesheet" href="https://unpkg.com/mvp.css"> 
-<style>
+    <style>
+        /* Container for the entire page */
+        .page-container {
+            display: flex;
+            height: 100vh; /* Set the height to 100% of the viewport */
+        }
 
-</style>
-    <div style="text-align: center;"><h1>Route Optimization for Food Delivery</h1></div>
+        /* Left side (20%) containing the form */
+        .left-side {
+            flex: 1; /* Occupy 20% of the available width */
+            background-color: #f0f0f0; /* Optional: Add a background color */
+        }
 
-    <div>
-        <!-- Form box to input the number of drivers -->
-        <form id="driversForm">
-            <label for="numberOfDrivers">Number of Drivers:</label>
-            <input type="number" id="numberOfDrivers" name="numberOfDrivers" min="0" value="0">
-            <button type="button" onclick="updateMap()">Update Map</button> <br>
+        /* Right side (80%) containing the iframe */
+        .right-side {
+            flex: 4; /* Occupy 80% of the available width */
+        }
+
+        /* Style the iframe */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* Remove iframe border */
+        }
+
+        .p { color: #333; font-family: 'Muli', sans-serif; margin-bottom: 15px; text-align: center; margin: auto;}
+
+        .button-35 {
+        width: 300px;
+        align-items: center;
+        background-color: #fff;
+        border-radius: 48px;
+        box-shadow: transparent 0 0 0 3px,rgba(18, 18, 18, .1) 0 6px 20px;
+        box-sizing: border-box;
+        color: #121212;
+        cursor: pointer;
+        display: inline-flex;
+        flex: 1 1 auto;
+        font-family: Inter,sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        justify-content: center;
+        line-height: 1.5;
+        margin: 10;
+        outline: none;
+        padding: 1rem 1.5rem;
+        text-align: center;
+        text-decoration: none;
+        transition: box-shadow .2s,-webkit-box-shadow .2s;
+        white-space: nowrap;
+        border: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        }
+
+        .button-35:hover {
+        box-shadow: #121212 0 0 0 3px, transparent 0 0 0 0;
+        }
+    </style>
+
+    <div class="page-container">
+        <div class="left-side">
+            <div class="p">
+                Route Optimizaiton for Food Delivery
+            </div>
+            <!-- Form box to input the number of drivers -->
+            <form id="driversForm" action="{{url_for("views.generate")}}" method="POST">
+                <label for="numberOfDrivers">Number of Drivers:</label>
+                <input type="number" id="numberOfDrivers" name="numberOfDrivers" min="0" value="0">
+                <label for="numberOfNodes">Number of Customers:</label>
+                <input type="number" id="numberOfNodes" name="numberOfNodes" min="0" value="0">
+                <button type="submit">Submit</button>
+                <button type="button" class="button-35" onclick="routeOptimizationS()">Route Optimization With Spectral</button><br>
+                <button type="button" class="button-35" onclick="routeOptimizationK()">Route Optimization With Knn</button><br>
+                <button type="button" class="button-35" onclick="routeOptimizationVroom()">Route Optimization Using VROOM</button><br>
+                <button type="button" class="button-35" onclick="showOriginal()">Show Customers Locations</button><br>
+                <button type="button" class="button-35" onclick="showSpectral()">Show Spectral Clusters</button><br>
+                <button type="button" class="button-35" onclick="showKnn()">Show Knn Clusters</button><br>
+                <button type="button" class="button-35" onclick="generate()">Generate Random Points</button><br>
+            </form>
+
+            <div class="p">
+                Vroom Optimization<br><br>
+                Total Duration: {{dfvrm['cost'][0] // 60 }} mins {{dfvrm['cost'][0]%60}} s <br>
+                Total Distance: {{dfvrm['distance'][0] // 1000 }} km {{dfvrm['distance'][0] % 1000 }} m
+                <!-- Total Duration: 0 mins 0 s <br>
+                Total Distance: 0 km 0 m -->
+            </div>
             <br>
-            <button type="button" onclick="optimization()">Route Optimization</button>
-            <button type="button" onclick="showOriginal()">Show Original</button>
-            <button type="button" onclick="generate()">Generate Random Points</button>
-        </form>
+            <div class="p">
+                My Optimization : {{method}}<br><br>
+                Total Duration: {{dfMy['cost'][0] // 60 }} mins {{dfMy['cost'][0]%60}} s <br>
+                Total Distance: {{dfMy['distance'][0] // 1000 }} km {{dfMy['distance'][0] % 1000 }} m
+            </div>
+        </div>
+
+        <div class="right-side">
+            
+            <iframe id="mapIframe" src={{mapSrc}} ></iframe> 
+        </div>
     </div>
     <br>
-    <div>
-        <h3>Total Cost: {{cost}}  Total Distance: {{distance}}  Total Duration: {{duration}}</h3>
-    </div>
     <script>
-        // Function to update the map based on the number of drivers input
-        function updateMap() {
-            var numberOfDrivers = document.getElementById("numberOfDrivers").value;
-            var mapIframe = document.getElementById("mapIframe");
-            
-            // Add the number of drivers as a query parameter to the map.html URL
-            var updatedSrc = "./static/map.html?drivers=" + numberOfDrivers;
-            
-            // Update the iframe source
-            mapIframe.src = updatedSrc;
+        var mapIframe = document.getElementById("mapIframe");
+
+        function routeOptimizationS(){
+            window.location.href = 'routeOptimizationS';
+        }
+        function routeOptimizationK(){
+            window.location.href = 'routeOptimizationK';
         }
 
-        function optimization(){
-            mapIframe.src = "./static/optimization.html"
+        function routeOptimizationVroom(){
+            window.location.href = 'routeOptimizationVroom';
         }
 
+        function showMap(mapSrc){
+            mapIframe.src = mapSrc
+        }
         function showOriginal(){
-            mapIframe.src = "./static/map.html"
+           displayMap("./static/randompoints.html");
         }
-        function generate(){
 
+        function generate(){
+            window.location.href = 'generate';
+        }
+
+        function showSpectral(){
+            window.location.href = "showSpectral";
+        }
+
+        function showKnn(){
+            window.location.href = "showKnn";
+        }
+
+        function displayMap(path) {
+            // Append a cache-busting parameter to the URL
+            const cacheBuster = Date.now(); // Generates a unique timestamp
+            const urlWithCacheBuster = `${path}?v=${cacheBuster}`;
+            mapIframe.src = urlWithCacheBuster;
         }
     </script>
     <br>
-    <iframe id="mapIframe" src="./static/map.html" style="position: absolute; width: 98%; height: 50%;"></iframe>
-
+    
 </body>
 </html>
